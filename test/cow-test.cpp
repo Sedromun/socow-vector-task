@@ -673,6 +673,21 @@ TEST_F(cow_test, clear_throw) {
   element::assert_no_instances();
 }
 
+TEST_F(cow_test, clear_throw_2) {
+  container a;
+  a.reserve(4 * 1e12 + 3 * 1e11 + 8 * 1e10);
+  for (size_t i = 0; i < 5; ++i) {
+    a.push_back(i + 100);
+  }
+
+  {
+    container b = a;
+    immutable_guard gb(a, b);
+
+    EXPECT_THROW(a.clear(), std::bad_alloc);
+  }
+}
+
 TEST_F(cow_test, begin) {
   container a;
   for (size_t i = 0; i < 5; ++i) {
