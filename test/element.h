@@ -1,5 +1,7 @@
 #pragma once
 
+#include "fault-injection.h"
+
 #include <gtest/gtest.h>
 
 #include <ostream>
@@ -87,6 +89,8 @@ public:
 
 private:
   void add_instance() {
+    fault_injection_point();
+    fault_injection_disable dg;
     auto p = instances().insert(this);
     if (!p.second) {
       FAIL() << "A new object is created at the address " << static_cast<void*>(this)
