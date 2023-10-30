@@ -683,6 +683,8 @@ TEST_F(cow_test, clear_throw_2) {
 
     {
       container b = a;
+      strong_exception_safety_guard sg_a(a);
+      strong_exception_safety_guard sg_b(b);
 
       a.clear();
       EXPECT_TRUE(a.empty());

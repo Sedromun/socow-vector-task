@@ -84,3 +84,47 @@ void expect_empty_storage(const socow_vector<element, SMALL_SIZE>& a) {
   EXPECT_EQ(0, a.size());
   expect_static_storage(a);
 }
+
+template <std::ranges::sized_range Actual,
+          std::ranges::sized_range Expected = std::initializer_list<std::ranges::range_value_t<Actual>>>
+void expect_eq(const Actual& actual, const Expected& expected) {
+  fault_injection_disable dg;
+
+  EXPECT_EQ(expected.size(), actual.size());
+
+  auto expected_first = expected.begin();
+  auto expected_last = expected.end();
+  auto actual_first = actual.begin();
+  auto actual_last = actual.end();
+
+  while (true) {
+    if (expected_first == expected_last || actual_first == actual_last) {
+      break;
+    }
+
+    EXPECT_EQ(*actual_first, *expected_first);
+    ++expected_first;
+    ++actual_first;
+  }
+
+  EXPECT_TRUE(expected_first == expected_last);
+  EXPECT_TRUE(actual_first == actual_last);
+}
+
+template <typename C>
+class strong_exception_safety_guard {
+public:
+  explicit strong_exception_safety_guard(const C& c) noexcept : ref(c), expected((fault_injection_disable{}, c)) {}
+
+  strong_exception_safety_guard(const strong_exception_safety_guard&) = delete;
+
+  ~strong_exception_safety_guard() {
+    if (std::uncaught_exceptions() > 0) {
+      expect_eq(expected, ref);
+    }
+  }
+
+private:
+  const C& ref;
+  C expected;
+};
