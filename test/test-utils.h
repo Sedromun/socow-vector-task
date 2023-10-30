@@ -112,6 +112,14 @@ void expect_eq(const Actual& actual, const Expected& expected) {
 }
 
 template <typename C>
+void expect_empty(const C& c) {
+  fault_injection_disable dg;
+  EXPECT_TRUE(c.empty());
+  EXPECT_EQ(0, c.size());
+  EXPECT_TRUE(c.begin() == c.end());
+}
+
+template <typename C>
 class strong_exception_safety_guard {
 public:
   explicit strong_exception_safety_guard(const C& c) noexcept : ref(c), expected((fault_injection_disable{}, c)) {}

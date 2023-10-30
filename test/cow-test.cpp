@@ -687,8 +687,7 @@ TEST_F(cow_test, clear_throw_2) {
       strong_exception_safety_guard sg_b(b);
 
       a.clear();
-      EXPECT_TRUE(a.empty());
-      EXPECT_EQ(a.capacity(), 10);
+      expect_empty(a);
     }
   });
 }
